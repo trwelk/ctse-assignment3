@@ -1,18 +1,18 @@
 const mongoose = require('mongoose');
 const {Schema} = require('mongoose');
 
-const StrgProductSchema = new Schema({
-    productId: String,
-    productName: String,
-    productType: String,
-    description: String,
-    unitOfMeasurement: String,
-    stocks: [{
+const MerchantSchema = new Schema({
+    id: String,
+    name: String,
+    email: String,
+    address: String,
+    businessName: String,
+    products: [{
       type: Schema.Types.ObjectId,
-      ref: 'StrgStock'
+      ref: 'Product'
    }],
-   unitPrice:String
+   password:String
 },
 {timestamps: true});
 
-module.exports = mongoose.model('StrgProduct', StrgProductSchema);
+module.exports = mongoose.model('Merchant', MerchantSchema);

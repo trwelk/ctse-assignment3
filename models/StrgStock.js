@@ -1,29 +1,22 @@
 const mongoose = require('mongoose');
 const {Schema} = require('mongoose');
 
-var StrgStock = mongoose.Schema({
-    stockId: {type:String,required:true},
-    product: {
+var Product = mongoose.Schema({
+    id: {type:String,required:true},
+    merchant: {
         type: Schema.Types.ObjectId,
-        ref: 'StrgProduct',
+        ref: 'Merchant',
         required: true
      },
-    supplierId: String,
-    recievedDate: String,
-    recievedQty: Number,
-    outGoingQty: Number,
-    stockLocation: {
+    name: String,
+    price: Number,
+    quantity: Number,
+    coupons: [{
         type: Schema.Types.ObjectId,
-        ref: 'StrgLocation',
-        required: true
-     },
-    purchasePrice: Number,
-    deflectionFromIdealHarvest:Number,
-    daysSinceHarvested: Number,
-    predictedExpiryDate: String
+        ref: 'Product'
+     }]
 
-    //addrecievingDate
 
  });
 
- module.exports = mongoose.model('StrgStock', StrgStock)
+ module.exports = mongoose.model('Product', Product)

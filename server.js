@@ -31,30 +31,8 @@ app.use(cors());
 app.use(strgProductRoutes.routes())
 .use(strgProductRoutes.allowedMethods());
 
-app.use(strgLocationRoutes.routes())
-.use(strgLocationRoutes.allowedMethods());
-
-app.use(strgOrderRoutes.routes())
-.use(strgOrderRoutes.allowedMethods());
-app.use(strgOrderItemRoutes.routes())
-.use(strgOrderItemRoutes.allowedMethods());
-
-
 app.use(strgStockRoutes.routes())
 .use(strgStockRoutes.allowedMethods());
-
-app.use(purchaseReqRoutes.routes())
-.use(purchaseReqRoutes.allowedMethods());
-
-app.use(purchaseReqItemRoutes.routes())
-.use(purchaseReqItemRoutes.allowedMethods());
-
-
-app.use(supplierRoutes.routes())
-.use(supplierRoutes.allowedMethods());
-
-app.use(donationItemRoutes.routes())
-.use(donationItemRoutes.allowedMethods());
 
 
 app.listen(9090);
