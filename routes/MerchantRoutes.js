@@ -9,7 +9,7 @@ const router = new Router({
 
 router.post('/signup', async ctx => {
     try {
-        //validate req.body data before saving
+        //validate req.body data before saving comment
         let {username,email, address, businessName, password,contact } = ctx.request.body;
             const merchant = new Merchant({
                 username: username,
@@ -18,7 +18,7 @@ router.post('/signup', async ctx => {
                 businessName: businessName,
                 password: password,
                 contact:contact
-                        });
+            });
 
             await merchant.save();
             ctx.response.status = (201)
