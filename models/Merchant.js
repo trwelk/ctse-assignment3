@@ -7,6 +7,7 @@ const MerchantSchema = new Schema({
     email: String,
     address: String,
     businessName: String,
+    contact:Number,
     products: [{
       type: Schema.Types.ObjectId,
       ref: 'Product'
