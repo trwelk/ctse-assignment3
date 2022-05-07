@@ -1,6 +1,8 @@
 const Router = require('@koa/router');
 const Merchant = require('../models/Merchant')
-const StrgStock = require('../models/StrgStock')
+const Product = require('../models/Product')
+const Coupon = require('../models/Coupon')
+
 const router = new Router({
     prefix: '/merchant'
 });
@@ -8,9 +10,8 @@ const router = new Router({
 router.post('/signup', async ctx => {
     try {
         //validate req.body data before saving
-        let {id,username,email, address, businessName, password,contact } = ctx.request.body;
+        let {username,email, address, businessName, password,contact } = ctx.request.body;
             const merchant = new Merchant({
-                id:merchantId,
                 username: username,
                 email:email,
                 address:address,
@@ -33,7 +34,6 @@ router.post('/login', async ctx => {
     try {
         let {email,password } = ctx.request.body;
 
-        let { id } = ctx.params;
         const data = await Merchant.find({email:email,password:password})
         if (data) {
             ctx.response.status = 200
@@ -50,46 +50,92 @@ router.post('/login', async ctx => {
     }
 });
 
-router.put('/:id', async ctx => {
+
+router.post('/product/addProduct', async ctx => {
     try {
+        let {merchantId,name, price, quantity } = ctx.request.body;
+
+        const merchant = await Merchant.findById({ _id: merchantId })
         //validate req.body data before saving
-        let {merchantId,merchantName,merchantType, description, unitOfMeasurement, stocks , unitPrice} = ctx.request.body;
-        let { id } = ctx.params;
-        const filter = { _id: id };
+            const product = new Product({
+                merchantId: merchantId,
+                name:name,
+                price:price,
+                quantity: quantity
+                        });
 
-        const merchant = {
-               merchantId:merchantId,
-               merchantName:merchantName,
-               merchantType:merchantType,
-                description:description,
-                unitOfMeasurement: unitOfMeasurement,
-                stocks: stocks,
-                unitPrice:unitPrice
-            };
-
-            var updatedProduct = await Merchant.findOneAndUpdate(filter, merchant, {
-                new: true,
-             })
-            ctx.response.status = (200)
-            ctx.response.body = { success: true, data: updatedProduct };
+            await product.save();
+            await merchant.products.push(product);
+            await merchant.save()
+            ctx.response.status = (201)
+            ctx.response.body = { success: true, data: product };
     } catch (err) {
         ctx.response.status = 400
         ctx.response.body = { success: false, message: err.message };
     }
 });
 
+router.get('/product/getAllProducts/:merchantId', async ctx => {
+    let { merchantId } = ctx.params;
+    if (merchantId) {
+        try {
+            const data = await Product.find({merchantId:merchantId});
+            ctx.response.status = 200
+            ctx.response.body = { success: true, data: data };
+        } catch (err) {
+            ctx.response.status = 400
+            ctx.response.body = { success: false, message: err.message };
+        }
+    } else {
+        ctx.response.status = 400
+        ctx.response.body = { success: false, message: "merchantId not found" };
+    }
+});
 
-router.get('/', async ctx => {
+
+router.post('/product/addProducoupon/addCoupon/:merchantId/:productId', async ctx => {
+    let { merchantId,productId } = ctx.params;
+
     try {
-        const data = await Merchant.find()
-                .populate({ path: 'stocks'})    ;
-        ctx.response.status = 200
-        ctx.response.body = { success: true, data: data };
+        console.log(productId)
+        const product = await Product.findById({ _id: productId })
+        //validate req.body data before saving
+        let {id,influencerTier,influencerDiscountPercentage, quantity } = ctx.request.body;
+            const coupon = new Coupon({
+                influencerTier: influencerTier,
+                influencerDiscountPercentage:influencerDiscountPercentage,
+                productId:productId,
+                quantity: quantity
+                        });
+
+            await coupon.save();
+            await product.coupons.push(coupon);
+            await product.save()
+
+            ctx.response.status = (201)
+            ctx.response.body = { success: true, data: coupon };
     } catch (err) {
         ctx.response.status = 400
         ctx.response.body = { success: false, message: err.message };
     }
-})
+});
+
+router.get('/coupon/getCouponsForMerchant/:merchantId', async ctx => {
+    //populate coupons properly
+    try {
+        let { merchantId } = ctx.params;
+        var merchant = await Merchant.findById({"_id":merchantId})
+                        .populate({ path: 'products'})
+                        .populate({path: 'coupons'})
+        ctx.response.status = (200)
+        ctx.response.body = { success: true, data: merchant.products };
+
+    } catch (err) {
+        ctx.response.status = 400
+        ctx.response.body = { success: false, message: err.message };
+    }
+ })
+
 
 router.get('/:id', async ctx => {
     try {

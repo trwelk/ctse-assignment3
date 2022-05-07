@@ -2,7 +2,6 @@ const mongoose = require('mongoose');
 const {Schema} = require('mongoose');
 
 const MerchantSchema = new Schema({
-    id: String,
     name: String,
     email: String,
     address: String,
